@@ -1,28 +1,31 @@
 import "./Login.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import authImage1 from "../../assets/auth-image1.png";
 import * as AuthenticationApi from "mock-authentication-api";
 import authImage2 from "../../assets/auth-image2.png";
 import AppButton from "../../components/app-button/AppButton";
-import { Input, Divider, notification } from "antd";
+import { Input, Divider, notification, Image } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import logo from "../../assets/logo4.svg";
 
-const Login = () => {
+const Login = ({ users }) => {
   const [user, setUser] = useState({});
   const [current, setCurrent] = useState(1);
+  const navigate = useNavigate();
 
   const netWorkLatency = 1000;
 
-  AuthenticationApi.configure(netWorkLatency, userStore);
+  // User store: Could add more users
+  AuthenticationApi.configure(netWorkLatency, users);
 
   const handleSubmit = async () => {
     if (current === 1) {
-      const currUser = userStore.find((u) => u.username === user?.username);
+      const currUser = users?.find((u) => u?.username === user?.username);
       if (!currUser) {
         return notification.error({
           title: "Error",
-          message: "Invalid user"
+          message: "Invalid user",
         });
       }
       setCurrent(2);
@@ -34,12 +37,13 @@ const Login = () => {
           user?.password
         );
         notification.success({
-          message: "correct info"
+          message: "Login successful",
         });
+        navigate("/");
       } catch (ex) {
         notification.error({
           title: "Error",
-          message: ex
+          message: ex,
         });
       }
     }
@@ -48,7 +52,7 @@ const Login = () => {
   return (
     <div className="Auth">
       <div>
-        <img src={logo} alt="" />
+        <Image preview={false} src={logo} alt="" />
       </div>
       <div className="Auth-box">
         <div className="center">
@@ -65,7 +69,7 @@ const Login = () => {
               <Input.Password
                 onChange={(e) => setUser({ ...user, password: e.target.value })}
                 placeholder="Enter Password"
-                style={{ height: "40px" }}
+                style={{ height: "60px" }}
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                 }
